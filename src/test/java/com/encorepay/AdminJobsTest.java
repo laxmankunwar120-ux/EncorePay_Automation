@@ -27,18 +27,15 @@ import com.encorepay.utilities.JobMonitoringSummaryFormatter;
 
 public class AdminJobsTest extends BaseClass {
 
-    // ─── Page Objects ─────────────────────────────────────────────────────────────
 
     private LoginPage loginPage;
     private AdminJobsPage adminJobsPage;
 
-    // ─── Shared Test State ────────────────────────────────────────────────────────
 
     private List<JobStatus> jobStatuses;
     private String pdfReportPath;
     private String googleChatReport;
 
-    // ─── Setup / Teardown ─────────────────────────────────────────────────────────
 
     @BeforeClass(alwaysRun = true)
     public void setupPages() {
@@ -51,7 +48,6 @@ public class AdminJobsTest extends BaseClass {
         super.logTestResult(result);
     }
 
-    // ─── TC01: Login ──────────────────────────────────────────────────────────────
 
     @Test(
         priority    = 1,
@@ -72,7 +68,6 @@ public class AdminJobsTest extends BaseClass {
         recordVerification("Admin Jobs user authentication verified successfully.");
     }
 
-    // ─── TC02: Navigate ───────────────────────────────────────────────────────────
 
     @Test(
         priority          = 2,
@@ -90,7 +85,6 @@ public class AdminJobsTest extends BaseClass {
         captureStep("Admin Jobs List");
     }
 
-    // ─── TC03: Capture ────────────────────────────────────────────────────────────
 
     @Test(
         priority          = 3,
@@ -102,7 +96,6 @@ public class AdminJobsTest extends BaseClass {
         jobStatuses = new ArrayList<>();
 
         if (!ConfigLoader.getInstance().isMultiClientEnabled()) {
-            // ── Single-client path ──────────────────────────────────────────────
             recordTestData(
                 "Single test instance mode — capturing all clients from Admin Jobs table"
                 + " | URL: " + config.getURL()
@@ -117,8 +110,6 @@ public class AdminJobsTest extends BaseClass {
             );
 
         } else {
-            // ── Multi-client path ───────────────────────────────────────────────
-            // FIX: getClients() takes no argument — the undefined variable 'c' is removed.
             List<ClientConfig> clients = ConfigLoader.getInstance().getClients();
 
             if (clients == null || clients.isEmpty()) {
@@ -139,7 +130,6 @@ public class AdminJobsTest extends BaseClass {
 
                 try {
                     if (i == 0) {
-                        // First client: reuse existing authenticated session when possible
                         ConfigLoader.getInstance().setActiveUrl(client.getUrl());
 
                         String currentUrl = driver.getCurrentUrl();
@@ -170,11 +160,9 @@ public class AdminJobsTest extends BaseClass {
                 }
             }
 
-            // Reset active URL after multi-client run
             ConfigLoader.getInstance().setActiveUrl(null);
         }
 
-        // Logout only after all jobs for all clients have completed.
         safeLogout();
 
         Assert.assertNotNull(jobStatuses,
@@ -190,7 +178,6 @@ public class AdminJobsTest extends BaseClass {
         captureStep("Admin Job Monitoring Data Captured");
     }
 
-    // ─── TC04: Google Chat Summary ────────────────────────────────────────────────
 
     @Test(
         priority          = 4,
@@ -212,7 +199,6 @@ public class AdminJobsTest extends BaseClass {
         recordVerification("Admin Job Monitoring report sent to Google Chat.");
     }
 
-    // ─── TC05: PDF ────────────────────────────────────────────────────────────────
 
     @Test(
         priority          = 5,
@@ -237,7 +223,6 @@ public class AdminJobsTest extends BaseClass {
         sendChatReportFileMessageIfConfigured(pdfReportPath);
     }
 
-    // ─── Private Helpers ──────────────────────────────────────────────────────────
 
     /**
      * Navigates to the given client's URL, waits for the page, logs in, then
@@ -320,7 +305,6 @@ public class AdminJobsTest extends BaseClass {
         try {
             new LogoutPage(driver).logout();
         } catch (Exception ignored) {
-            // Non-fatal — continue to next client
         }
     }
 

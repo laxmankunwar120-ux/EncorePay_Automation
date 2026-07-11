@@ -25,7 +25,7 @@ public class UNSecurityCouncilDownloadTest {
     private WebDriver driver;
     private ConfigLoader config;
 
-    @BeforeTest(alwaysRun = true)
+     @BeforeTest(alwaysRun = true)
     public void setUpUnTest() {
         config = ConfigLoader.getInstance();
         driver = createChromeDriver();

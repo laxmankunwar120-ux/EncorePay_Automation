@@ -46,34 +46,20 @@ public class AdminJobsPage extends BasePage {
             "Upcoming Demands Job", "UP_COMING_DEMAND"));
     }
 
-    // â”€â”€ Menu / navigation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-
     @FindBy(xpath = "//button[contains(@class,'menu-btn') and normalize-space()='Admin']")
     private WebElement adminMenuBtn;
 
     private final By jobsMenu = By.xpath(
         "//*[self::button or self::a][normalize-space()='Job' or normalize-space()='Jobs']");
 
-    // â”€â”€ Table locators â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-
     private final By jobListTable = By.xpath(
         "//table[.//tbody//tr[td]] | //app-custom-table[.//*[td]]");
 
-    // Simplified: match every tbody row in any table on the job-list page.
-    // findJobRow / firstMatchingJobListRow already filter by job name text,
-    // so a broad row selector is safe and avoids header-name brittle matching.
     private final By jobListRows = By.xpath("//table//tbody//tr");
-
 
     private final By receiptButton = By.xpath(
         ".//button[normalize-space()='Receipt'] | .//a[normalize-space()='Receipt']");
 
-    // Simplified: the latest execution record is always the first tbody row.
-    // Targets only <button> because the DOM is: <button class="link">View</button>
-    // The previous multi-tier XPath with header-AND logic was over-engineered and
-    // still ambiguous when the summary section also rendered a View button.
-    // //tbody/tr[1] unambiguously means "first data row of whichever tbody is first
-    // in DOM order on the detail page" â€” which is the execution-history table.
     private final By firstActionViewBtn =
         By.xpath("//tbody/tr[1]//button[normalize-space()='View']");
 
@@ -82,8 +68,6 @@ public class AdminJobsPage extends BasePage {
         + " | //button[@aria-label='Close' or @aria-label='close']"
         + " | //span[contains(text(),'close')]/ancestor::button[1]"
         + " | //*[local-name()='mat-icon' and normalize-space()='close']/ancestor::button[1]");
-
-    // â”€â”€ Receipt-filter locators â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     private final By showFilterButton = By.xpath(
         "//button[contains(@class,'btn-light-blue') and contains(.,'Show Filter')]"
@@ -103,8 +87,6 @@ public class AdminJobsPage extends BasePage {
     private final By clearButton = By.xpath(
         "//button[normalize-space()='Clear' or contains(normalize-space(),'Clear')]");
 
-    // â”€â”€ Receipt-table / error locators â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-
     private final By errorIconInRow = By.xpath(
         ".//*[contains(@class,'error') and (contains(@class,'icon') or contains(@class,'outline'))]"
         + " | .//*[normalize-space()='error_outline']"
@@ -118,21 +100,18 @@ public class AdminJobsPage extends BasePage {
         "//table[.//th[contains(normalize-space(),'Account') or contains(normalize-space(),'Receipt')]]"
         + "//tbody//tr[td]");
 
-    // â”€â”€ Detail-modal locator (scope reads from dialog, not full body) â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    // FIX #6 â€“ read detail text from the visible modal/dialog, not the entire <body>
     private final By activeModal = By.xpath(
         "//*[contains(@class,'mat-mdc-dialog-container') and @aria-modal='true']"
         + " | //*[@role='dialog' and not(contains(@style,'display: none'))]"
         + " | //*[contains(@class,'modal') and contains(@class,'show')]"
         + " | //*[contains(@class,'swal2-popup') and not(contains(@style,'display: none'))]");
 
-    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // Real container for the execution details view (app-job-details-view), not a Material Dialog.
+    private final By jobDetailsViewLocator = By.cssSelector("app-job-details-view");
 
     public AdminJobsPage(WebDriver driver) {
         super(driver);
     }
-
-    // â”€â”€ Public API â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     public void navigateToAdminJobs() {
         if (!tryOpenFromMenu()) openJobsRouteDirectly();
@@ -159,7 +138,6 @@ public class AdminJobsPage extends BasePage {
         ensureOnJobsListPage();
         statuses.add(captureUpcomingDemandsJob(clientName));
 
-        // Ensure we return to the Jobs list and perform logout to clean up session state
         try {
             navigateBackToJobsList();
             waitForJobsPage();
@@ -169,13 +147,9 @@ public class AdminJobsPage extends BasePage {
         return statuses;
     }
 
-    // â”€â”€ Per-job capture â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-
-
     private List<JobStatus> capturePostReceiptsJob(String clientName) {
         List<JobStatus> statuses = new ArrayList<>();
 
-        // --- Receipt section ---
         WebElement postReceiptsRow = findJobRow(POST_RECEIPTS_JOB);
         WebElement receiptBtn = firstVisibleInRow(postReceiptsRow, receiptButton);
         if (receiptBtn == null)
@@ -185,19 +159,13 @@ public class AdminJobsPage extends BasePage {
         ActionDriver.globalSafeClick(driver, receiptBtn);
         waitForReceiptPage();
 
-        // FIX #4 â€“ always clear filters between FAILED and PENDING passes
         List<JobStatus> failedRows  = captureReceiptRows("FAILED",  clientName);
         List<JobStatus> pendingRows = captureReceiptRows("PENDING", clientName);
 
-        // Close the Receipt overlay/modal before navigating back.
-        // clearReceiptFilters first, then dismiss the overlay. closeModal() now
-        // targets the front-most (topmost) close button so the Receipt page is
-        // dismissed rather than a lingering nested error popup.
         clearReceiptFilters();
-        closeModal();   // closes the front-most overlay and waits for it to disappear
+        closeModal();
         System.out.println("Receipt page closed");
 
-        // --- Job detail section ---
         ensureOnJobsListPage();
 
         JobStatus summary = new JobStatus();
@@ -215,23 +183,20 @@ public class AdminJobsPage extends BasePage {
             clickFirstActionView();
             waitForViewModal();
 
-            // Wait explicitly for the execution details modal to appear and be visible
             try {
                 new WebDriverWait(driver, Duration.ofSeconds(12))
                     .until(d -> {
                         try {
-                            List<WebElement> modals = d.findElements(activeModal);
+                            List<WebElement> modals = d.findElements(jobDetailsViewLocator);
                             return !modals.isEmpty() && modals.get(0).isDisplayed();
                         } catch (Exception e) { return false; }
                     });
             } catch (Exception ignored) {}
 
-        // Keep the popup open briefly to allow dynamic content to stabilise (reduced)
-        waitMillis(300);
+            waitMillis(300);
 
-        readModalDetails(summary);
+            readModalDetails(summary);
 
-            // Close execution details and wait for job details/page transitions
             closeExecutionAndReturnToJobs();
             System.out.println("Returning to Jobs page successfully");
 
@@ -243,8 +208,6 @@ public class AdminJobsPage extends BasePage {
             safeRecoverToJobsList();
         }
 
-
-        // Attach receipt counts to the summary row
         summary.setFailedCount(failedRows.size());
         summary.setPendingCount(pendingRows.size());
         summary.setPendingRecords(joinReceiptRefs(pendingRows));
@@ -265,7 +228,6 @@ public class AdminJobsPage extends BasePage {
         return captureJobDetails(UPCOMING_DEMANDS_JOB, clientName);
     }
 
-    
     private JobStatus captureJobDetails(String jobName, String clientName) {
         JobStatus status = new JobStatus();
         status.setJobName(jobName);
@@ -276,11 +238,9 @@ public class AdminJobsPage extends BasePage {
             status.setStatus(readRowStatus(jobRow));
             status.setCurrentStatus(status.getStatus());
 
-            // Step: Click View on the job row â†’ navigate to job detail page
             clickViewInRow(jobRow);
             waitForJobDetailPage();
 
-            // Step: Click View on the latest execution record
             clickFirstActionView();
             waitForViewModal();
 
@@ -288,16 +248,16 @@ public class AdminJobsPage extends BasePage {
                 new WebDriverWait(driver, Duration.ofSeconds(12))
                     .until(d -> {
                         try {
-                            List<WebElement> modals = d.findElements(activeModal);
+                            List<WebElement> modals = d.findElements(jobDetailsViewLocator);
                             return !modals.isEmpty() && modals.get(0).isDisplayed();
                         } catch (Exception e) { return false; }
                     });
             } catch (Exception ignored) {}
             waitMillis(800);
 
-           readModalDetails(status);
+            readModalDetails(status);
 
-           closeExecutionAndReturnToJobs();
+            closeExecutionAndReturnToJobs();
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -311,7 +271,7 @@ public class AdminJobsPage extends BasePage {
         return status;
     }
 
-    
+    // Clicks the View button in a job list row.
     private void clickViewInRow(WebElement row) {
         System.out.println("Opening Job Details");
 
@@ -324,10 +284,10 @@ public class AdminJobsPage extends BasePage {
                 scrollIntoView(btn);
                 waitForUiStable();
                 try {
-                    btn.click();                                           // normal click first
+                    btn.click();
                 } catch (Exception clickEx) {
                     ((JavascriptExecutor) driver)
-                        .executeScript("arguments[0].click();", btn);     // JS fallback
+                        .executeScript("arguments[0].click();", btn);
                 }
                 return;
             } catch (Exception ignored) {}
@@ -336,11 +296,10 @@ public class AdminJobsPage extends BasePage {
             "View button not found in job row: " + row.getText().trim());
     }
 
-   
+    // Opens the latest execution record from the job history table.
     private void clickFirstActionView() {
         System.out.println("Opening Latest Execution");
 
-        // â”€â”€ Step 1: activate Job Info tab if it exists and is not already active â”€â”€
         try {
             By jobInfoTab = By.xpath(
                 "//button[normalize-space()='Job Info']"
@@ -368,20 +327,14 @@ public class AdminJobsPage extends BasePage {
                 }
                 break;
             }
-        } catch (Exception ignored) {
-            // No tabs â€“ table rendered inline; continue
-        }
+        } catch (Exception ignored) {}
 
-    
         try {
             new WebDriverWait(driver, Duration.ofSeconds(15))
                 .until(ExpectedConditions.visibilityOfElementLocated(
                     By.xpath("//tbody/tr[1]")));
-        } catch (Exception ignored) {
-            // Table may appear only after tab activation; proceed to step 3
-        }
+        } catch (Exception ignored) {}
 
-        // â”€â”€ Step 3: wait for the target button to be clickable â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         WebElement actionView = null;
         try {
             actionView = new WebDriverWait(driver, Duration.ofSeconds(20))
@@ -392,7 +345,6 @@ public class AdminJobsPage extends BasePage {
             throw new IllegalStateException(
                 "View button not found in execution-history table (first row).");
 
-        // â”€â”€ Step 4: click â€“ normal first, JS fallback â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         scrollIntoView(actionView);
         waitForUiStable();
         try {
@@ -402,82 +354,76 @@ public class AdminJobsPage extends BasePage {
         }
     }
 
+    // Closes the front-most visible overlay.
     private void closeModal() {
-    try {
-        List<WebElement> btns = driver.findElements(modalCloseBtn);
+        try {
+            List<WebElement> btns = driver.findElements(modalCloseBtn);
 
-        // Click the FRONT-MOST (last in DOM order) visible close button. Nested
-        // popups (e.g. the FAILED error popup) are appended later in the DOM and
-        // sit on top of the underlying Receipt page, so this dismisses the popup
-        // first and leaves the Receipt page overlay to be closed afterwards.
-        WebElement target = null;
-        for (int i = btns.size() - 1; i >= 0; i--) {
-            if (btns.get(i).isDisplayed() && btns.get(i).isEnabled()) {
-                target = btns.get(i);
-                break;
+            WebElement target = null;
+            for (int i = btns.size() - 1; i >= 0; i--) {
+                if (btns.get(i).isDisplayed() && btns.get(i).isEnabled()) {
+                    target = btns.get(i);
+                    break;
+                }
             }
-        }
 
-        if (target != null) {
-            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", target);
-            waitForUiStable();
-            // Wait until the dismissed overlay is actually gone.
-            try {
-                new WebDriverWait(driver, Duration.ofSeconds(3))
-                    .until(ExpectedConditions.invisibilityOfElementLocated(activeModal));
-            } catch (Exception ignored) {}
-            return;
-        }
-    } catch (Exception ignored) {
+            if (target != null) {
+                ((JavascriptExecutor) driver).executeScript("arguments[0].click();", target);
+                waitForUiStable();
+                try {
+                    new WebDriverWait(driver, Duration.ofSeconds(3))
+                        .until(ExpectedConditions.invisibilityOfElementLocated(activeModal));
+                } catch (Exception ignored) {}
+                return;
+            }
+        } catch (Exception ignored) {}
+
+        System.out.println("No modal close button found. Skipping close.");
     }
 
-    System.out.println("No modal close button found. Skipping close.");
-}
-  
-        private void closeExecutionAndReturnToJobs() {
+    // Closes the execution details view and returns to the Jobs page.
+    private void closeExecutionAndReturnToJobs() {
 
-    // Close View - POST_RECEIPT page
-    WebElement closeBtn1 = new WebDriverWait(driver, Duration.ofSeconds(10))
-            .until(ExpectedConditions.elementToBeClickable(
-                    By.xpath("(//span[normalize-space()='close']/ancestor::button)[last()]")));
+        WebElement closeBtn1 = new WebDriverWait(driver, Duration.ofSeconds(10))
+                .until(ExpectedConditions.elementToBeClickable(
+                        By.xpath("(//span[normalize-space()='close']/ancestor::button)[last()]")));
 
-    ((JavascriptExecutor) driver)
-            .executeScript("arguments[0].click();", closeBtn1);
+        ((JavascriptExecutor) driver)
+                .executeScript("arguments[0].click();", closeBtn1);
 
-            // Wait until the execution-details modal is gone and the Job Details page is visible
-            try {
+        try {
             new WebDriverWait(driver, Duration.ofSeconds(10))
-                .until(ExpectedConditions.invisibilityOfElementLocated(activeModal));
-            } catch (Exception ignored) {}
-            try {
+                .until(ExpectedConditions.invisibilityOfElementLocated(jobDetailsViewLocator));
+        } catch (Exception ignored) {}
+        try {
             new WebDriverWait(driver, Duration.ofSeconds(10))
                 .until(ExpectedConditions.visibilityOfElementLocated(
                     By.xpath("//*[contains(text(),'Job Info')]") ));
-            } catch (Exception ignored) {}
+        } catch (Exception ignored) {}
 
-    System.out.println("Closed execution detail");
+        System.out.println("Closed execution detail");
 
-    // Close POST_RECEIPT page
-    WebElement closeBtn2 = new WebDriverWait(driver, Duration.ofSeconds(10))
-            .until(ExpectedConditions.elementToBeClickable(
-                    By.xpath("(//span[normalize-space()='close']/ancestor::button)[last()]")));
+        WebElement closeBtn2 = new WebDriverWait(driver, Duration.ofSeconds(10))
+                .until(ExpectedConditions.elementToBeClickable(
+                        By.xpath("(//span[normalize-space()='close']/ancestor::button)[last()]")));
 
         ((JavascriptExecutor) driver)
-            .executeScript("arguments[0].click();", closeBtn2);
+                .executeScript("arguments[0].click();", closeBtn2);
 
-        // Wait until Jobs page loads (explicit wait)
         waitForJobsPage();
 
-    System.out.println("Returned to Jobs page");
-}
-    private void safeRecoverToJobsList() {
-     System.out.println("DETAILS CAPTURED");
+        System.out.println("Returned to Jobs page");
+    }
 
-    navigateBackToJobsList();
+    // Recovers to the Jobs list page after an unexpected failure.
+    private void safeRecoverToJobsList() {
+        System.out.println("DETAILS CAPTURED");
+
+        navigateBackToJobsList();
         navigateBackToJobsList();
     }
 
-
+    // Captures receipt rows for a given LMS posting status.
     private List<JobStatus> captureReceiptRows(String postingStatus, String clientName) {
         clickShowFilter();
         selectPostingStatus(postingStatus);
@@ -512,11 +458,11 @@ public class AdminJobsPage extends BasePage {
             } catch (Exception ignored) {}
         }
 
-        // Always clear filters so the next call (PENDING pass) starts fresh
         clearReceiptFilters();
         return receipts;
     }
 
+    // Reads a single receipt row into a JobStatus.
     private JobStatus readReceiptRow(WebElement row, String postingStatus) {
         List<WebElement> cells = row.findElements(By.xpath("./td"));
         Map<String, Integer> hdrs = headerIndexes(row);
@@ -538,6 +484,7 @@ public class AdminJobsPage extends BasePage {
         return status;
     }
 
+    // Reads the error popup for a failed receipt row.
     private void readReceiptErrorPopup(WebElement row, JobStatus status) {
         WebElement icon = firstVisibleInRow(row, errorIconInRow);
         if (icon == null) {
@@ -562,6 +509,7 @@ public class AdminJobsPage extends BasePage {
         closeModal();
     }
 
+    // Opens the receipt filter panel.
     private void clickShowFilter() {
         try {
             WebElement showFilter = new WebDriverWait(driver, Duration.ofSeconds(10))
@@ -571,6 +519,7 @@ public class AdminJobsPage extends BasePage {
         } catch (Exception ignored) {}
     }
 
+    // Selects the LMS posting status filter.
     private void selectPostingStatus(String postingStatus) {
         List<WebElement> selects = driver.findElements(lmsPostingStatus);
         if (selects.isEmpty()) return;
@@ -597,8 +546,6 @@ public class AdminJobsPage extends BasePage {
         }
         if (targetText == null) return;
 
-        // Fast path: set the value via JS and fire the change/input events Angular
-        // listens to, instead of the slower Selenium option lookup + click.
         try {
             ((JavascriptExecutor) driver).executeScript(
                 "var sel=arguments[0], val=arguments[1];"
@@ -609,7 +556,6 @@ public class AdminJobsPage extends BasePage {
                 selectEl, targetValue);
             waitForUiStable();
 
-            // Verify the selection took effect; fall back to Selenium if it didn't.
             boolean selected = false;
             try {
                 WebElement chosen = select.getFirstSelectedOption();
@@ -623,6 +569,7 @@ public class AdminJobsPage extends BasePage {
         waitForUiStable();
     }
 
+    // Selects today's date in the receipt date filter.
     private void selectTodayReceiptDate() {
         List<WebElement> inputs = driver.findElements(receiptDateInput);
         if (inputs.isEmpty() || !inputs.get(0).isDisplayed()) return;
@@ -631,7 +578,6 @@ public class AdminJobsPage extends BasePage {
         scrollIntoView(dateInput);
         ActionDriver.globalSafeClick(driver, dateInput);
 
-        // Try a "Today" button in a date-picker first
         try {
             WebElement today = new WebDriverWait(driver, Duration.ofSeconds(4))
                 .until(ExpectedConditions.elementToBeClickable(By.xpath(
@@ -643,7 +589,6 @@ public class AdminJobsPage extends BasePage {
             return;
         } catch (Exception ignored) {}
 
-        // Fallback: set value via JS
         String todayStr = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         ((JavascriptExecutor) driver).executeScript(
             "arguments[0].value = arguments[1];"
@@ -654,6 +599,7 @@ public class AdminJobsPage extends BasePage {
         waitForUiStable();
     }
 
+    // Clears the receipt filters.
     private void clearReceiptFilters() {
         try {
             List<WebElement> clears = driver.findElements(clearButton);
@@ -664,7 +610,7 @@ public class AdminJobsPage extends BasePage {
         } catch (Exception ignored) {}
     }
 
-    // â”€â”€ Navigation helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // Opens the Jobs page from the Admin menu.
     private boolean tryOpenFromMenu() {
         try {
             ActionDriver.globalSafeClick(driver, clickable(adminMenuBtn));
@@ -685,6 +631,7 @@ public class AdminJobsPage extends BasePage {
         }
     }
 
+    // Navigates to the Jobs route directly via URL.
     private void openJobsRouteDirectly() {
         String currentUrl = driver.getCurrentUrl();
         String baseUrl = currentUrl.contains("#")
@@ -694,6 +641,7 @@ public class AdminJobsPage extends BasePage {
         waitForPageLoad();
     }
 
+    // Waits for the Jobs list page to load.
     private void waitForJobsPage() {
         new WebDriverWait(driver, Duration.ofSeconds(20)).until(d -> {
             String url  = d.getCurrentUrl().toLowerCase(Locale.ROOT);
@@ -705,7 +653,7 @@ public class AdminJobsPage extends BasePage {
         });
     }
 
-    
+    // Waits for the Receipt page to load.
     private void waitForReceiptPage() {
         new WebDriverWait(driver, Duration.ofSeconds(20)).until(d -> {
             String body = d.findElement(By.tagName("body")).getText().toLowerCase(Locale.ROOT);
@@ -717,9 +665,8 @@ public class AdminJobsPage extends BasePage {
         waitForUiStable();
     }
 
-   
+    // Waits for the Job Detail page to load.
     private void waitForJobDetailPage() {
-        // Phase 1 â€“ page shell
         new WebDriverWait(driver, Duration.ofSeconds(20)).until(d -> {
             String url  = d.getCurrentUrl().toLowerCase(Locale.ROOT);
             String body = d.findElement(By.tagName("body")).getText().toLowerCase(Locale.ROOT);
@@ -732,18 +679,16 @@ public class AdminJobsPage extends BasePage {
                 || (body.contains("start date") && body.contains("actions"));
         });
 
-        // Phase 2 â€“ wait for the first tbody row to be visible
         try {
             new WebDriverWait(driver, Duration.ofSeconds(10))
                 .until(ExpectedConditions.visibilityOfElementLocated(
                     By.xpath("//tbody/tr[1]")));
-        } catch (Exception ignored) {
-            // Row behind inactive tab â€“ clickFirstActionView will handle tab activation
-        }
+        } catch (Exception ignored) {}
 
         waitForUiStable();
     }
 
+    // Waits for the execution details view to render.
     private void waitForViewModal() {
         try {
             new WebDriverWait(driver, Duration.ofSeconds(12))
@@ -756,7 +701,7 @@ public class AdminJobsPage extends BasePage {
         } catch (Exception ignored) {}
     }
 
-    // Wait for approximately the given milliseconds without Thread.sleep; uses WebDriverWait polling
+    // Waits for approximately the given milliseconds without Thread.sleep.
     private void waitMillis(long millis) {
         try {
             long start = System.currentTimeMillis();
@@ -765,13 +710,13 @@ public class AdminJobsPage extends BasePage {
         } catch (Exception ignored) {}
     }
 
+    // Ensures the driver is back on the Jobs list page.
     private void ensureOnJobsListPage() {
         String url = driver.getCurrentUrl().toLowerCase(Locale.ROOT);
         if (url.contains("/admin/job") && !url.contains("/details") && !url.contains("/detail")) {
             try {
                 waitForJobsPage();
                 if (!driver.findElements(jobListTable).isEmpty()) {
-                    
                     if (!driver.findElements(activeModal).isEmpty()
                             || !driver.findElements(modalCloseBtn).isEmpty()) {
                         closeModal();
@@ -786,16 +731,16 @@ public class AdminJobsPage extends BasePage {
         System.out.println("Returned to Jobs page");
     }
 
+    // Navigates back to the Jobs list page.
     private void navigateBackToJobsList() {
         openJobsRouteDirectly();
         waitForJobsPage();
     }
 
-
+    // Finds the job row matching the given job name.
     private WebElement findJobRow(String jobName) {
         waitForJobsPage();
 
-        // Wait for tbody to be populated before scanning for job names
         try {
             new WebDriverWait(driver, Duration.ofSeconds(15))
                 .until(ExpectedConditions.presenceOfElementLocated(jobListRows));
@@ -813,6 +758,7 @@ public class AdminJobsPage extends BasePage {
         throw new IllegalStateException("Job row not found: " + jobName);
     }
 
+    // Finds the first job list row matching the given job name.
     private WebElement firstMatchingJobListRow(String jobName) {
         String expected = normalizeForMatch(jobName);
         for (WebElement row : driver.findElements(jobListRows)) {
@@ -824,6 +770,7 @@ public class AdminJobsPage extends BasePage {
         return null;
     }
 
+    // Finds the first visible element matching the locator within a row.
     private WebElement firstVisibleInRow(WebElement row, By locator) {
         try {
             for (WebElement el : row.findElements(locator)) {
@@ -833,43 +780,23 @@ public class AdminJobsPage extends BasePage {
         return null;
     }
 
-
+    // Reads execution details from the job details view.
     private void readModalDetails(JobStatus status) {
         try {
-            // Locate the execution-detail modal by its content (the labels it
-            // contains), not by a fragile class/role matcher, so capture works
-            // regardless of how the dialog container is rendered.
             final WebElement modalEl = waitForExecutionModal();
-            if (modalEl == null) { System.out.println("DBG readModalDetails: no modal found"); return; }
-            System.out.println("DBG readModalDetails: modal found, class=" + modalEl.getAttribute("class"));
+            if (modalEl == null) return;
 
-            // Scroll the INNER dialog content container (mat-dialog-content / modal-body),
-            // never the outer dialog, so bottom fields become visible.
             WebElement scrollable = findScrollableContainer(modalEl);
 
-            // Wait briefly for the key labels to be present (no bulk text capture)
-            try {
-                new WebDriverWait(driver, Duration.ofSeconds(6)).until(d -> {
-                    try {
-                        return !modalEl.findElements(
-                                    By.xpath(".//*[normalize-space()='End Date']")).isEmpty()
-                            || !modalEl.findElements(
-                                    By.xpath(".//*[normalize-space()='Start Date']")).isEmpty();
-                    } catch (Exception e) { return false; }
-                });
-            } catch (Exception ignored) {}
-
-            // Prescribed sequence (per live modal layout):
-            // scroll to BOTTOM first (Job Status + Failure Reason live there),
-            // then scroll back to TOP for the date/time fields.
             scrollContainerTo(scrollable, "bottom");
-            waitMillis(80);
+            waitForLabelsVisible(modalEl, "Status", "Execution Status", "Result",
+                "Failure Reason", "Reason", "Error Message", "Error");
             String uiStatus = readField(modalEl, scrollable, "Status", "Execution Status", "Result");
             String uiReason = readField(modalEl, scrollable,
                 "Failure Reason", "Reason", "Error Message", "Error");
 
             scrollContainerTo(scrollable, "top");
-            waitMillis(80);
+            waitForLabelsVisible(modalEl, "Start Date", "End Date");
             String uiStartDate = readField(modalEl, scrollable, "Start Date");
             String uiStartTime = readField(modalEl, scrollable, "Start Time");
             String uiEndDate   = readField(modalEl, scrollable, "End Date");
@@ -886,125 +813,65 @@ public class AdminJobsPage extends BasePage {
             if (!uiReason.isBlank())    status.setFailureReason(uiReason);
 
             status.setExecutionResult(firstNonBlank(status.getExecutionResult(), status.getStatus()));
-
-            // Debug output for verification
-            System.out.println("UI Status = " + status.getStatus());
-            System.out.println("UI Reason = " + uiReason);
-            System.out.println("UI EndDate = " + uiEndDate);
-            System.out.println("UI EndTime = " + uiEndTime);
         } catch (Exception ignored) {}
     }
 
-    // Locate the execution-detail modal, waiting briefly for it to appear.
+    // Waits for the execution details view to appear.
     private WebElement waitForExecutionModal() {
         try {
-            return new WebDriverWait(driver, Duration.ofSeconds(12))
-                .until(d -> findExecutionModal());
-        } catch (Exception ignored) { return null; }
+            new WebDriverWait(driver, Duration.ofSeconds(12))
+                .until(ExpectedConditions.visibilityOfElementLocated(jobDetailsViewLocator));
+            return findExecutionModal();
+        } catch (Exception ignored) {
+            return null;
+        }
     }
 
-    // Find the open execution-detail dialog. The dialog reliably exposes a
-    // "close" button (span text 'close'), so we anchor detection on that
-    // (and on distinctive tab/field labels) rather than a fragile class/role
-    // matcher that does not match this dialog shell.
+    // Locates the execution details view.
     private WebElement findExecutionModal() {
-        // 1) The dialog's "close" button -> walk up to the dialog container.
         try {
-            for (WebElement btn : driver.findElements(
-                    By.xpath("//span[normalize-space()='close']/ancestor::button"))) {
-                try {
-                    if (btn.isDisplayed()) {
-                        WebElement dlg = ancestorDialog(btn);
-                        if (dlg != null) { revealBottom(dlg); return dlg; }
-                    }
-                } catch (Exception ignored) {}
+            for (WebElement el : driver.findElements(jobDetailsViewLocator)) {
+                if (el.isDisplayed()) return el;
             }
         } catch (Exception ignored) {}
-
-        // 2) A dialog that contains a distinctive tab/field label.
-        String[] markers = {"Posting Logs", "Basic", "Job Status", "Execution", "View -"};
-        for (String m : markers) {
-            try {
-                for (WebElement el : driver.findElements(
-                        By.xpath("//*[contains(normalize-space(text()),'" + m + "')]"))) {
-                    if (!el.isDisplayed()) continue;
-                    WebElement dlg = ancestorDialog(el);
-                    if (dlg != null) { revealBottom(dlg); return dlg; }
-                }
-            } catch (Exception ignored) {}
-        }
-
-        // 3) Fallback: container matchers.
-        WebElement c = findDialogContainer();
-        if (c != null) { revealBottom(c); return c; }
-
-        // 4) Fallback: generic activeModal matcher.
-        for (WebElement m : driver.findElements(activeModal)) {
-            try { if (m.isDisplayed()) { revealBottom(m); return m; } } catch (Exception ignored) {}
-        }
         return null;
     }
 
-    private void revealBottom(WebElement modal) {
+    // Waits until at least one of the given field labels is visible.
+    private void waitForLabelsVisible(WebElement modal, String... labels) {
         try {
-            WebElement sc = findScrollableContainer(modal);
-            scrollContainerTo(sc, "bottom");
-            scrollContainerTo(sc, "top");
+            new WebDriverWait(driver, Duration.ofSeconds(6)).until(d -> {
+                for (String label : labels) {
+                    try {
+                        List<WebElement> els = modal.findElements(
+                            By.xpath(".//*[normalize-space()='" + label + "']"));
+                        for (WebElement el : els) {
+                            if (el.isDisplayed()) return true;
+                        }
+                    } catch (Exception ignored) {}
+                }
+                return false;
+            });
         } catch (Exception ignored) {}
     }
 
-    // Detect the dialog shell regardless of which fields are currently rendered.
-    private WebElement findDialogContainer() {
-        String[] xpaths = {
-            "//mat-dialog-container",
-            "//*[@role='dialog']",
-            "//div[contains(@class,'cdk-overlay-pane')]",
-            "//div[contains(@class,'mat-mdc-dialog-container')]",
-            "//div[contains(@class,'mat-dialog')]",
-            "//div[contains(@class,'modal-content')]"
-        };
-        for (String xp : xpaths) {
-            try {
-                for (WebElement el : driver.findElements(By.xpath(xp))) {
-                    try { if (el.isDisplayed()) return el; } catch (Exception ignored) {}
-                }
-            } catch (Exception ignored) {}
-        }
-        return null;
-    }
-
-    private WebElement ancestorDialog(WebElement el) {
-        try {
-            return el.findElement(By.xpath(
-                "ancestor::*["
-                + "self::mat-dialog-container"
-                + " or self::*[@role='dialog']"
-                + " or contains(@class,'mat-mdc-dialog-container')"
-                + " or contains(@class,'modal-content')"
-                + " or contains(@class,'modal-body')"
-                + " or contains(@class,'cdk-overlay-pane')"
-                + " or contains(@class,'dialog')"
-                + "][1]"));
-        } catch (Exception ignored) { return null; }
-    }
-
-    // ── Modal field-reading helpers (per-field DOM parse, no bulk modal text) ──
-
+    // Reads a labelled field's value from the modal.
     private String readField(WebElement modal, WebElement scrollable, String... labels) {
         for (String label : labels) {
             try {
                 List<WebElement> labelEls = modal.findElements(
                         By.xpath(".//*[normalize-space(text())='" + label + "']"));
-                // The REAL Job Status (and date fields) live at the BOTTOM of the
-                // dialog and only render after scrolling down, so prefer the
-                // bottom-most displayed label element, not the first match.
                 WebElement chosen = null;
                 for (WebElement el : labelEls) {
-                    if (el.isDisplayed()) chosen = el;   // last displayed wins (bottom)
+                    if (el.isDisplayed()) chosen = el;
                 }
                 if (chosen != null) {
                     scrollLabelIntoView(chosen);
-                    waitMillis(40);
+                    final WebElement labelEl = chosen;
+                    try {
+                        new WebDriverWait(driver, Duration.ofSeconds(3))
+                            .until(d -> !valueOfLabel(labelEl).isBlank());
+                    } catch (Exception ignored) {}
                     String v = valueOfLabel(chosen);
                     if (!v.isBlank()) return v;
                 }
@@ -1013,17 +880,14 @@ public class AdminJobsPage extends BasePage {
         return "";
     }
 
-    // Extract a SINGLE value for the specific label element (its sibling / value
-    // cell / nearby text), never the entire popup body.
+    // Extracts a single value for the given label element.
     private String valueOfLabel(WebElement labelEl) {
         String labelText = clean(labelEl.getText());
-        // 1) immediate following sibling element
         try {
             WebElement sib = labelEl.findElement(By.xpath("following-sibling::*[1]"));
             String v = clean(sib.getText());
             if (!v.isBlank() && !v.equalsIgnoreCase(labelText)) return v;
         } catch (Exception ignored) {}
-        // 2) any other child of the label's parent (label/value row pattern)
         try {
             WebElement parent = labelEl.findElement(By.xpath(".."));
             for (WebElement k : parent.findElements(By.xpath("*"))) {
@@ -1031,7 +895,6 @@ public class AdminJobsPage extends BasePage {
                 if (!v.isBlank() && !v.equalsIgnoreCase(labelText)) return v;
             }
         } catch (Exception ignored) {}
-        // 3) nearby following text node within the modal
         try {
             for (WebElement n : labelEl.findElements(
                     By.xpath("following::node()[position()<5]"))) {
@@ -1041,6 +904,8 @@ public class AdminJobsPage extends BasePage {
         } catch (Exception ignored) {}
         return "";
     }
+
+    // Extracts a labelled field's value using sibling/parent traversal.
     private String getModalFieldValue(WebElement labelEl) {
         String labelText = clean(labelEl.getText());
         try {
@@ -1058,6 +923,7 @@ public class AdminJobsPage extends BasePage {
         return "";
     }
 
+    // Scrolls a label element into view.
     private void scrollLabelIntoView(WebElement labelEl) {
         try {
             ((JavascriptExecutor) driver).executeScript(
@@ -1065,36 +931,46 @@ public class AdminJobsPage extends BasePage {
         } catch (Exception ignored) {}
     }
 
-    // Locate the real scrollable content container inside the dialog
-    // (mat-dialog-content / modal-body / cdk-scrollable), not the outer dialog.
+    // Finds the scrollable execution details container, waiting for content to render.
     private WebElement findScrollableContainer(WebElement modal) {
-        List<WebElement> candidates = modal.findElements(By.xpath(
-            ".//*[self::mat-dialog-content"
-            + " or contains(@class,'mat-dialog-content')"
-            + " or contains(@class,'dialog-content')"
-            + " or contains(@class,'modal-body')"
-            + " or contains(@class,'modal-content')"
-            + " or contains(@class,'cdk-scrollable')"
-            + " or contains(@class,'scrollable')"
-            + " or contains(@class,'ps')]"));
-        for (WebElement c : candidates) {
-            if (isScrollable(c)) return c;
-        }
-        // Fallback: the descendant with the greatest scrollable overflow is the
-        // real inner content container (never the outer dialog shell).
-        WebElement best = null;
-        long bestOverflow = 0;
-        for (WebElement c : modal.findElements(By.xpath(".//*"))) {
-            try {
-                long overflow = (Long) ((JavascriptExecutor) driver).executeScript(
-                    "var e=arguments[0]; return e.scrollHeight - e.clientHeight;", c);
-                if (overflow > bestOverflow) { bestOverflow = overflow; best = c; }
-            } catch (Exception ignored) {}
-        }
-        if (best != null && bestOverflow > 2) return best;
-        return modal;
+        WebElement target = null;
+        try {
+            List<WebElement> containers = modal.findElements(
+                By.xpath(".//div[contains(@class,'overflow-auto')]"));
+            for (WebElement c : containers) {
+                if (c.isDisplayed()) { target = c; break; }
+            }
+        } catch (Exception ignored) {}
+
+        if (target == null) target = modal;
+
+        final WebElement container = target;
+        try {
+            new WebDriverWait(driver, Duration.ofSeconds(8)).until(d -> isScrollable(container));
+            return container;
+        } catch (Exception ignored) {}
+
+        WebElement deep = findDeepestScrollable(modal);
+        return deep != null ? deep : container;
     }
 
+    // Falls back to the descendant with the greatest scrollable overflow.
+    private WebElement findDeepestScrollable(WebElement modal) {
+        WebElement best = null;
+        long bestOverflow = 0;
+        try {
+            for (WebElement c : modal.findElements(By.xpath(".//*"))) {
+                try {
+                    long overflow = (Long) ((JavascriptExecutor) driver).executeScript(
+                        "var e=arguments[0]; return e.scrollHeight - e.clientHeight;", c);
+                    if (overflow > bestOverflow) { bestOverflow = overflow; best = c; }
+                } catch (Exception ignored) {}
+            }
+        } catch (Exception ignored) {}
+        return (best != null && bestOverflow > 2) ? best : null;
+    }
+
+    // Checks whether an element is scrollable.
     private boolean isScrollable(WebElement el) {
         try {
             return (Boolean) ((JavascriptExecutor) driver).executeScript(
@@ -1102,6 +978,7 @@ public class AdminJobsPage extends BasePage {
         } catch (Exception ignored) { return false; }
     }
 
+    // Scrolls the given container to top or bottom.
     private void scrollContainerTo(WebElement container, String position) {
         try {
             if ("bottom".equals(position)) {
@@ -1110,9 +987,13 @@ public class AdminJobsPage extends BasePage {
             } else {
                 ((JavascriptExecutor) driver).executeScript("arguments[0].scrollTop = 0;", container);
             }
+            Long scrollTop = (Long) ((JavascriptExecutor) driver)
+                .executeScript("return Math.round(arguments[0].scrollTop);", container);
+            System.out.println("Scrolled execution details to " + position + ", scrollTop=" + scrollTop);
         } catch (Exception ignored) {}
     }
 
+    // Normalizes a raw status string into a canonical status value.
     private String normalizeStatus(String raw) {
         if (raw == null) return "";
         String s = clean(raw).toUpperCase(Locale.ROOT);
@@ -1127,17 +1008,16 @@ public class AdminJobsPage extends BasePage {
         return parts.length > 0 ? parts[0] : raw;
     }
 
+    // Applies parsed detail text onto a JobStatus.
     private void applyDetails(String details, JobStatus status) {
         status.setJobName(firstNonBlank(readDetail(details, "Job Name"), status.getJobName()));
         status.setJobType(firstNonBlank(readDetail(details, "Job Type"), status.getJobType()));
         status.setStartDate(firstNonBlank(readDetail(details, "Start Date"), status.getStartDate()));
-        // FIX #5 â€“ End Date and End Time are the primary capture targets per the spec
         status.setEndDate(firstNonBlank(readDetail(details, "End Date"), status.getEndDate()));
         status.setStartTime(firstNonBlank(readDetail(details, "Start Time"), status.getStartTime()));
         status.setEndTime(firstNonBlank(readDetail(details, "End Time"), status.getEndTime()));
         status.setDuration(firstNonBlank(readDetail(details, "Duration", "Time Duration"), status.getDuration()));
         status.setNextFireTime(firstNonBlank(readDetail(details, "Next Fire Time"), status.getNextFireTime()));
-        // Always capture Status from the Job Details modal text â€” do NOT fall back to previous row status
         String modalStatus = readDetail(details, "Status", "Execution Status", "Result");
         if (modalStatus == null) modalStatus = "";
         modalStatus = modalStatus.trim();
@@ -1145,11 +1025,11 @@ public class AdminJobsPage extends BasePage {
         status.setCurrentStatus(status.getStatus());
         status.setExecutionResult(firstNonBlank(status.getExecutionResult(), status.getStatus()));
 
-        // Capture full failure/reason text when available
         String failReason = readDetail(details, "Failure Reason", "Reason", "Error Message", "Error");
         if (!failReason.isBlank()) status.setFailureReason(failReason);
     }
 
+    // Reads the status value from a job list row.
     private String readRowStatus(WebElement row) {
         List<WebElement> cells = row.findElements(By.xpath("./td"));
         return firstNonBlank(
@@ -1157,6 +1037,7 @@ public class AdminJobsPage extends BasePage {
             findStatus(cells));
     }
 
+    // Finds a status-like value among a row's cells.
     private String findStatus(List<WebElement> cells) {
         for (WebElement cell : cells) {
             String n = normalizeForMatch(cell.getText());
@@ -1167,6 +1048,7 @@ public class AdminJobsPage extends BasePage {
         return "";
     }
 
+    // Extracts a labelled value from raw text using known label boundaries.
     private String readDetail(String source, String... labels) {
         String bodyText = clean(source);
         if (bodyText.isBlank()) return "";
@@ -1199,8 +1081,7 @@ public class AdminJobsPage extends BasePage {
         return "";
     }
 
-    // â”€â”€ Table header/cell helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-
+    // Builds a map of table header names to column indexes.
     private Map<String, Integer> headerIndexes(WebElement row) {
         Map<String, Integer> indexes = new LinkedHashMap<>();
         try {
@@ -1212,6 +1093,7 @@ public class AdminJobsPage extends BasePage {
         return indexes;
     }
 
+    // Reads a cell value by header name.
     private String cell(List<WebElement> cells, Map<String, Integer> headers, String... names) {
         for (String name : names) {
             String expected = normalizeHeader(name);
@@ -1224,10 +1106,12 @@ public class AdminJobsPage extends BasePage {
         return "";
     }
 
+    // Reads a cell value by index.
     private String cellText(List<WebElement> cells, int index) {
         return (index >= 0 && index < cells.size()) ? text(cells.get(index)) : "";
     }
 
+    // Joins receipt reference numbers into a single string.
     private String joinReceiptRefs(List<JobStatus> receipts) {
         List<String> refs = new ArrayList<>();
         for (JobStatus r : receipts)
@@ -1235,31 +1119,35 @@ public class AdminJobsPage extends BasePage {
         return String.join(", ", refs);
     }
 
-    // â”€â”€ String utilities â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-
+    // Returns the first non-blank value, cleaned of extra whitespace.
     private String firstNonBlank(String... values) {
         for (String v : values)
             if (v != null && !v.trim().isEmpty()) return clean(v);
         return "";
     }
 
+    // Reads and cleans the text of an element.
     private String text(WebElement element) {
         try { return clean(element.getText()); }
         catch (Exception ignored) { return ""; }
     }
 
+    // Collapses whitespace and trims a string.
     private String clean(String value) {
         return value == null ? "" : value.replaceAll("\\s+", " ").trim();
     }
 
+    // Normalizes a header name for comparison.
     private String normalizeHeader(String value) {
         return clean(value).toLowerCase(Locale.ROOT).replace(":", "");
     }
 
+    // Normalizes text for loose matching.
     private String normalizeForMatch(String value) {
         return clean(value).toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9]+", " ").trim();
     }
 
+    // Builds a short error message from an exception.
     private String shortError(Exception e) {
         if (e == null) return "";
         String msg = clean(e.getMessage());
@@ -1267,7 +1155,7 @@ public class AdminJobsPage extends BasePage {
         return firstNonBlank(msg, e.getClass().getSimpleName());
     }
 
-    // Wait until the modal text stabilises (length unchanged for a few polls) or timeout
+    // Waits until the modal text stabilises or timeout is reached.
     private void waitForModalTextStability(WebElement modal, Duration timeout) {
         try {
             final int[] stableCount = {0};
@@ -1282,7 +1170,6 @@ public class AdminJobsPage extends BasePage {
                     return stableCount[0] >= 3;
                 });
 
-            // Enforce minimum visible time (~400ms reduced for speed)
             long minMillis = 400;
             long start = System.currentTimeMillis();
             if (minMillis > 0) {
@@ -1292,7 +1179,7 @@ public class AdminJobsPage extends BasePage {
         } catch (Exception ignored) {}
     }
 
-    // Scroll inside modal to the first occurrence of any of the provided labels
+    // Scrolls the modal to the first occurrence of any of the given labels.
     private void scrollToModalSection(WebElement modal, String... labels) {
         try {
             for (String label : labels) {
@@ -1312,19 +1199,17 @@ public class AdminJobsPage extends BasePage {
         } catch (Exception ignored) {}
     }
 
-    // Try to extract a label/value pair from the modal using DOM traversal
+    // Extracts a label/value pair from the modal using DOM traversal.
     private String getModalLabelValue(WebElement modal, String... labels) {
         try {
             for (String label : labels) {
                 try {
-                    // 1) label element followed by a sibling value
                     List<WebElement> els = modal.findElements(By.xpath(
                         ".//*[normalize-space(text())='" + label + "']/following-sibling::*[1]"));
                     for (WebElement el : els) {
                         if (el.isDisplayed()) return text(el);
                     }
 
-                    // 2) label and value inside same parent (label node then sibling text node)
                     List<WebElement> parents = modal.findElements(By.xpath(
                         ".//*[normalize-space(text())='" + label + "']/parent::*"));
                     for (WebElement p : parents) {
@@ -1333,10 +1218,9 @@ public class AdminJobsPage extends BasePage {
                                 if (!child.getText().trim().equalsIgnoreCase(label) && child.isDisplayed())
                                     return text(child);
                             }
-        } catch (Exception e) { System.out.println("DBG readModalDetails EXCEPTION: " + e.getMessage()); }
-    }
+                        } catch (Exception ignored) {}
+                    }
 
-                    // 3) label text node followed by a nearby text node (less reliable)
                     List<WebElement> near = modal.findElements(By.xpath(
                         ".//*[contains(normalize-space(text()), '" + label + "')]/following::node()[position()<4]"));
                     for (WebElement n : near) {
