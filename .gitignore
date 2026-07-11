@@ -1,0 +1,9 @@
+target/
+test-output/
+*.class
+*.log
+.idea/
+.settings/
+.project
+.classpath
+src/main/resources/google-drive-key.json

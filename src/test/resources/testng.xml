@@ -1,0 +1,69 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+
+<suite name="Encorepay Complete Automation Suite" verbose="1" preserve-order="true" parallel="false">
+
+    <listeners>
+        <listener class-name="com.encorepay.listeners.ExtentListener"/>
+    </listeners>
+
+    <test name="Login and Logout Tests" preserve-order="true">
+        <classes>
+            <class name="com.encorepay.LoginLogoutTest"/>
+        </classes>
+    </test>
+
+    <test name="Dashboard Tests" preserve-order="true">
+        <classes>
+            <class name="com.encorepay.DashboardTest"/>
+        </classes>
+    </test>
+
+    <test name="Collections Module Tests" preserve-order="true">
+        <classes>
+            <class name="com.encorepay.CollectionsTest"/>
+        </classes>
+    </test>
+
+    <test name="Allocation Tests" preserve-order="true">
+        <classes>
+            <class name="com.encorepay.AllocationTest"/>
+        </classes>
+    </test>
+
+    <test name="Generate Receipt Tests" preserve-order="true">
+        <classes>
+            <class name="com.encorepay.GenerateReceiptTest"/>
+        </classes>
+    </test>
+
+    <test name="Deposit Slips Tests" preserve-order="true">
+        <classes>
+            <class name="com.encorepay.DepositSlipsTest"/>
+        </classes>
+    </test>
+
+    <test name="Batch Submission Tests" preserve-order="true">
+        <classes>
+            <class name="com.encorepay.BatchSubmissionTest"/>
+        </classes>
+    </test>
+
+    <test name="Reconciliation Tests" preserve-order="true">
+        <classes>
+            <class name="com.encorepay.ReconciliationTest"/>
+        </classes>
+    </test>
+
+    <test name="Admin Jobs Tests" preserve-order="true">
+        <classes>
+            <class name="com.encorepay.AdminJobsTest"/>
+        </classes>
+    </test>
+
+    <test name="End-to-End Flow Tests" preserve-order="true">
+        <classes>
+            <class name="com.encorepay.EndToEndFlowTest"/>
+        </classes>
+    </test>
+
+</suite>

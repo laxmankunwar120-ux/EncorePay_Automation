@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="AdminJobsSuite" verbose="2" parallel="false">
+    <listeners>
+        <listener class-name="com.encorepay.listeners.ExtentListener"/>
+    </listeners>
+    <test name="AdminJobsTest">
+        <classes>
+            <class name="com.encorepay.AdminJobsTest"/>
+        </classes>
+    </test>
+    <test name="UNSecurityCouncilDownloadTest">
+        <classes>
+            <class name="com.encorepay.UNSecurityCouncilDownloadTest"/>
+        </classes>
+    </test>
+</suite>
