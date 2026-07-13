@@ -1,9 +1,29 @@
+# Build
 target/
+cp.txt
+
+# Reports
+reports/
+allure-results/
 test-output/
-*.class
+
+# Downloads
+downloads/
+
+# Screenshots
+screenshots/
+
+# Logs
+logs/
 *.log
+
+# IDE
+.vscode/
 .idea/
 .settings/
 .project
 .classpath
-src/main/resources/google-drive-key.json
+
+# OS
+.DS_Store
+Thumbs.db

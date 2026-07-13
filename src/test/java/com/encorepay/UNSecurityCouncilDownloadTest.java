@@ -83,6 +83,10 @@ public class UNSecurityCouncilDownloadTest {
     private WebDriver createChromeDriver() {
         WebDriverManager.chromedriver().setup();
         ChromeOptions chromeOptions = new ChromeOptions();
+        chromeOptions.addArguments("--headless=new");
+        chromeOptions.addArguments("--disable-gpu");
+        chromeOptions.addArguments("--no-sandbox");
+        chromeOptions.addArguments("--disable-dev-shm-usage");
         chromeOptions.setPageLoadStrategy(PageLoadStrategy.EAGER);
 
         chromeOptions.addArguments(

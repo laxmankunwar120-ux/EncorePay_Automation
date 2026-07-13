@@ -26,6 +26,19 @@ public class CollectionsPage extends BasePage {
         super(driver);
     }
 
+    /**
+     * Navigates to the Collection Items listing screen using the existing
+     * menu navigation with a URL fallback. Reuses the internal navigation
+     * helpers so behaviour stays consistent with the other collection flows.
+     */
+    public void openCollectionItems() {
+        if (!openCollectionItemsFromMenu()) {
+            driver.navigate().to(buildCollectionItemsUrl());
+            waitForPageLoad();
+        }
+        waitForUiStable();
+    }
+
     public void openGenerateReceiptQueue() {
         if (!openCollectionItemsFromMenu()) {
             driver.navigate().to(buildCollectionItemsUrl());
